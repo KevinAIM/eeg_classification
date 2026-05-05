@@ -64,5 +64,10 @@ def main():
     y = np.concatenate(list_y) # Concatenate the list of labels (list_y) into a single array (y)
     print(f"Data shape: {X.shape}, Labels shape: {y.shape}") # Print the shapes of the data and labels arrays to verify the dimensions
 
+    #Save processed data so that we don't have to preprocess it again. This will save time when we want to train our model.
+    np.save('../data/X.npy', X)
+    np.save('../data/y.npy', y)
+    print("Saved X and y to data/")
+
 if __name__ == "__main__":
     main()
