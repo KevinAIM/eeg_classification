@@ -52,12 +52,18 @@ def main():
 
     list_X = [] # Initialize an empty list to store the extracted data (X) for all subjects and runs
     list_y = [] # Initialize an empty list to store the extracted labels (y) for all subjects and runs
+    
+    subjects = [] # Tracking number of subjects
+
     for subject_id in range(1, 110):
         for run in (4, 8, 12):
             X, y = load_subject(subject_id, run)
             if X is not None and y is not None:
                 list_X.append(X) # Append the extracted data (X) to the list of data (list_X)
                 list_y.append(y) # Append the extracted labels (y) to the list of labels (list_y)
+
+                for i in X:
+                    subjects.append(subject_id)
     
     # Concatenate the lists of data and labels into single arrays. The data (X) is concatenated along the first axis (n_epochs), and the labels (y) are concatenated into a single array.
     X = np.concatenate(list_X, axis=0) # Concatenate the list of data (list_X) into a single array (X)
@@ -65,9 +71,12 @@ def main():
     print(f"Data shape: {X.shape}, Labels shape: {y.shape}") # Print the shapes of the data and labels arrays to verify the dimensions
 
     #Save processed data so that we don't have to preprocess it again. This will save time when we want to train our model.
-    np.save('../data/X.npy', X)
-    np.save('../data/y.npy', y)
+    np.save(data_dir / 'X.npy', X)
+    np.save(data_dir / 'y.npy', y)
     print("Saved X and y to data/")
+    np.save(data_dir / 'subjects.npy', np.array(subjects))
+    print("Saved subjects to data/")
+
 
 if __name__ == "__main__":
     main()
