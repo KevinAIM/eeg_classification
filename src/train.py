@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
-from model import EEGClassifier
+from model import EEGClassifier, EEGNet
 from pathlib import Path
 
 # Load preprocessed data
@@ -45,7 +45,7 @@ train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True) # Batch si
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 # Initialize model, loss function, and optimizer
-model = EEGClassifier()
+model = EEGNet()
 criterion = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
