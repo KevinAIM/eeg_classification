@@ -49,12 +49,14 @@ model = EEGNet()
 criterion = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-epochs = 30
+epochs = 50
+
+best_accuracy = 0
 
 for epoch in range(epochs):
+    # TRAINING BLOCK
     model.train()
     total_loss = 0
-
     for X_batch, y_batch in train_loader:
         optimizer.zero_grad()
         output = model(X_batch)
@@ -63,22 +65,21 @@ for epoch in range(epochs):
         optimizer.step()
         total_loss += loss.item()
 
-    print(f"Epoch {epoch+1}/{epochs}, Loss: {total_loss/len(train_loader):.4f}")
+    # EVALUATION BLOCK
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for X_batch, y_batch in test_loader:
+            output = model(X_batch)
+            predicted = (output > 0.5).float()
+            correct += (predicted == y_batch).sum().item()
+            total += y_batch.size(0)
 
-model.eval()
-correct = 0
-total = 0
+    accuracy = correct / total
+    print(f"Epoch {epoch+1}/{epochs}, Loss: {total_loss/len(train_loader):.4f}, Accuracy: {accuracy:.4f}")
 
-with torch.no_grad():
-    for X_batch, y_batch in test_loader:
-        output = model(X_batch)
-        predicted = (output > 0.5).float()
-        correct += (predicted == y_batch).sum().item()
-        total += y_batch.size(0)
-
-accuracy = correct / total
-print(f"Test Accuracy: {accuracy:.4f}")
-torch.save(model.state_dict(), results_dir / 'model.pth')
-print("Model saved.")
-
-print(X.shape, y.shape)
+    if accuracy > best_accuracy:
+        best_accuracy = accuracy
+        torch.save(model.state_dict(), results_dir / 'model.pth')
+        print(f"  → New best: {accuracy:.4f}, model saved")
